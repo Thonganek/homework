@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ระบบส่งการบ้าน AI Course</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        :root {
+            --primary-color: #4ade80;
+            --secondary-color: #2dd4bf;
+            --bg-gradient: linear-gradient(135deg, #dcfce7 0%, #ccfbf1 100%);
+            --glass-bg: rgba(255, 255, 255, 0.90);
+        }
+        body {
+            font-family: 'Prompt', sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            align-items: center; 
+            justify-content: center;
+            padding: 15px;
+            margin: 0;
+        }
+        .main-card {
+            background: var(--glass-bg);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+            width: 100%;
+            max-width: 550px;
+            padding: 25px;
+            position: relative;
+        }
+        @media (min-width: 768px) { .main-card { padding: 40px; } }
+        .form-control {
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            padding: 12px;
+        }
+        .btn-submit {
+            background: linear-gradient(90deg, #10b981, #14b8a6);
+            border: none;
+            border-radius: 50px;
+            padding: 14px;
+            font-size: 1.1rem;
+            color: white;
+            width: 100%;
+            margin-top: 25px;
+            box-shadow: 0 4px 15px rgba(20, 184, 166, 0.3);
+        }
+        .icon-box {
+            width: 60px; height: 60px; background: #d1fae5; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 15px; color: #059669; font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container d-flex justify-content-center">
+        <div class="main-card">
+            <div class="text-center mb-4">
+                <div class="icon-box"><i class="fas fa-robot"></i></div>
+                <h2 style="color: #0f766e; font-weight: 600;">ส่งการบ้าน AI Course</h2>
+            </div>
+
+            <form id="submissionForm" onsubmit="submitForm(event)">
+                <div class="row g-2">
+                    <div class="col-12 col-md-6">
+                        <label class="form-label text-muted small">ชื่อ-นามสกุล</label>
+                        <input type="text" class="form-control" id="fullname" required>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label text-muted small">ชื่อเล่น</label>
+                        <input type="text" class="form-control" id="nickname" required>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <label class="form-label text-muted small">หน่วยงาน</label>
+                    <input type="text" class="form-control" id="agency" required>
+                </div>
+                <div class="mt-2">
+                    <label class="form-label text-muted small">ชื่อโปรเจค</label>
+                    <input type="text" class="form-control" id="project_name" required>
+                </div>
+                <div class="mt-2">
+                    <label class="form-label text-muted small">ลิ้งค์ผลงาน</label>
+                    <input type="url" class="form-control" id="project_link" placeholder="https://" required>
+                </div>
+                <button type="submit" class="btn btn-submit" id="btnSubmit"><i class="fas fa-paper-plane me-2"></i> ส่งข้อมูล</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwsFhpvIRRRYnd5MH2vLfbHS9Q8bPawuDw-MVqfvmhrJH_6Ur8GY2-YBvCciOj2tns-/exec';
+
+        function submitForm(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmit');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่ง...';
+            btn.disabled = true;
+
+            const data = {
+                action: 'submit',
+                fullname: document.getElementById('fullname').value,
+                nickname: document.getElementById('nickname').value,
+                agency: document.getElementById('agency').value,
+                project_name: document.getElementById('project_name').value,
+                project_link: document.getElementById('project_link').value
+            };
+
+            fetch(SCRIPT_URL, {
+                method: 'POST', mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'บันทึกสำเร็จ!',
+                    text: 'ข้อมูลถูกส่งเข้าระบบแล้ว',
+                    showCancelButton: true,
+                    confirmButtonText: 'ไปที่ Dashboard',
+                    cancelButtonText: 'ส่งอีกครั้ง',
+                    confirmButtonColor: '#059669'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // เปลี่ยนหน้าไปที่ dashboard.html
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        document.getElementById('submissionForm').reset();
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    }
+                });
+            })
+            .catch(error => {
+                console.error(error);
+                Swal.fire('Error', 'ตรวจสอบอินเทอร์เน็ต', 'error');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+        }
+    </script>
+</body>
+</html>
